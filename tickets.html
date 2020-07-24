@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <script src="tikarray.js"></script>
+    
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>HTML to PDF Eample</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.min.js"></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    
+    
+    <style>
+        body {
+            background: rgb(255, 255, 0, 1.0);
+        }
+    </style>
+</head>
+
+<body>
+    <center><input type="text" id="noofTiks" style="text-align: center;font-size: 24px;width: 320px;height: 72px;"
+            placeholder="Enter no. of tickets required"></center>
+
+    <center><button class="btn btn-error" id="createPlist"
+            style="margin-top: 10px;text-align: center;font-size: 40px;width: 100px;height: 80px;">OK</button></center>
+    <br>
+
+
+
+    <center><button class="btn btn-success" id="giveTik"
+            style="margin-top: 10px;margin-left: 10px;text-align: center;font-size: 40px;height: 80px;">CREATE
+            TICKETS</button></center><br><br><br>
+
+    <center>
+        <div id="pList" style="font-size: 28px">
+        </div>
+    </center><br>
+
+    <center>
+        <div id="div" style="font-size: 24px;
+margin: 20px auto;
+padding: 10px;
+text-align: center;">
+        </div>
+    </center>
+
+    <center><button class="btn btn-primary" id='riddle' style="font-size: 32px;height: 80px;"> ASK RIDDLES
+        </button>
+        <button class="btn btn-primary" id='gotoHome' style="margin-left: 10px;font-size: 32px;height: 80px;"> HOME
+        </button></center><br><br>
+        
+
+    <script>
+        var table;
+        var x;
+        var y;
+        var input_value;
+        var element;
+        var clonediv;
+
+        $('#createPlist').click(function plrList() {
+            count = Number($('#noofTiks').val());
+            caption = $('<caption>');
+            table = $('<table>');
+            table = $(table).css({ "border": "1px solid black" });
+            var thead = $('<thead>');
+            var htr = $('<tr>');
+            var tbody = $('<tbody>');
+            for (var a = 0; a < count; a++) {
+                var row = $('<tr>');
+                for (var b = 0; b < 2; b++) {
+                    var td = $("<td>");
+                    td = $(td).css({ "border": "1px solid black" });
+                    if (b == 0) {
+                        var srNo = a + 1;
+                        td.append(srNo);
+                    } else {
+                        var input = $('<input>');
+                        td.append(input);
+                    }
+                    row.append(td);
+                }
+                tbody.append(row);
+            }
+            var th = $('<th>');
+            th.append("Sr. No.");
+            htr.append(th);
+            th = $('<th>');
+            th.append("Player Name");
+            htr.append(th);
+            thead.append(htr);
+            table.append(thead);
+            table.append(tbody);
+            caption.append("PLAYER_LIST_(OPTIONAL)");
+            $('#pList').append(caption);
+            $('#pList').append(table);
+        });
+
+        $('#createPlist').on('click', function () {
+            $(this).prop('disabled', true);
+        });
+
+        
+        
+
+
+        $('#giveTik').click(function () {
+            count = Number($('#noofTiks').val());
+
+            for (h = 0; h < count; h++) {
+                var tik = getTickets(1)[0]
+                var table = $('<table id="tiktable'+h+'">');
+                table = $(table).css({
+                    "border": "1px solid black",
+                    "margin": "20px auto",
+                    "width": "500px",
+                    "height": "250px"
+                })
+                var thead = $('<thead>');
+                var tbody = $('<tbody>');
+
+                for (var i = 0; i < 3; i++) {
+                    // append new row to body
+                    var row = $('<tr>');
+                    //var row = '';
+                    for (var j = 0; j < 9; j++) {
+                        // append new td to row
+                        var td = $("<td>");
+                        td = $(td).css({
+                            "border": "1px solid black",
+                        })
+                        if (tik[i][j] == 0) {
+                            td.append("");
+                        } else {
+                            td.append(" " + tik[i][j] + " ");
+                        }
+                        row.append(td);
+                    }
+                    tbody.append(row);
+                }
+                var showTable = $('#pList').find('tr').eq(h + 1);
+
+                // For "selected" row of table1 ..
+                var rowFromTable1 = showTable;
+
+                // .. Take a clone/copy of it ..
+                var clonedRowFromTable1 = rowFromTable1.clone();
+                
+                //finding input value
+                input_value = clonedRowFromTable1.find("input").val();
+                
+                //getting sr.no 
+                var texts = clonedRowFromTable1.find("td:first").text();
+                //replace td with th and add sr.no and input value
+                clonedRowFromTable1.find("td:first").replaceWith("<th colspan='9'>" + texts + ". " + input_value + "</th>")
+                clonedRowFromTable1.find("td:last").remove()//remove next td
+                //append cloned elemnt to thead
+                thead.append(clonedRowFromTable1);
+                table.append(thead)//append to table
+                table.append(tbody);
+                $('#div').append(table);
+                
+        //         var x = "tiktable"+h;
+        //         var y = (h+1) + ". " + input_value + ".pdf";
+        //         element = document.getElementById(x);
+    
+        //   html2pdf()
+        //     .from(element)
+        //     .save(y);
+        }
+        // clonediv = document.getElementById("div").innerHTML;
+        // localStorage.setItem("checktiks",clonediv);
+        });
+
+        $('#giveTik').on('click', function () {
+        for(h = 0; h < count; h++) {
+        x = "tiktable"+h;
+        y = (h+1) + ". " + input_value + ".pdf";
+        element = document.getElementById(x);
+
+        html2canvas(element[0], {
+                onrendered: function (canvas) {
+                    var data = canvas.toDataURL();
+                    var docDefinition = {
+                        content: [{
+                            image: data,
+                            width: 500
+                        }]
+                    };
+                    pdfMake.createPdf(docDefinition).download(y);
+
+        //   html2pdf()
+        //     .from(element)
+        //     .save(y,'Tickets');
+        }
+        });
+        }
+        clonediv = document.getElementById("div").innerHTML;
+        localStorage.setItem("checktiks",clonediv);
+        });
+
+        $('#giveTik').on('click', function () {
+            $(this).prop('disabled', true);
+        });
+        
+
+        $('#riddle').click(function () {
+            $(location).attr('href', "riddle.html");
+        });
+        $('#gotoHome').click(function () {
+            $(location).attr('href', "homepage.html");
+        });
+    </script>
+</body>
+
+</html>
